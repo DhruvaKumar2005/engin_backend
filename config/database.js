@@ -1,29 +1,30 @@
-require('dotenv').config();
-const { Pool } = require('pg');
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const pool = require("./config/database");
+const userRoutes = require("./routes/userRoutes");
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+const app = express();
+
+// Middleware
+app.use(cors()); // Allow cross-origin requests
+app.use(express.json()); // Parse JSON request bodies
+
+// Routes
+app.use("/api", userRoutes);
+
+// Root Route
+app.get("/", (req, res) => {
+    res.send("Server is running successfully!");
 });
 
-const createTableQuery = `
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    full_name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    role VARCHAR(50) NOT NULL,
-    location VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-`;
-
-const connectDB = async () => {
+// Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, async () => {
     try {
-        await pool.query(createTableQuery);
-        console.log("✅ Users table ready!");
-    } catch (error) {
-        console.error("❌ Database Table Error:", error.message);
+        await pool.connect();
+        console.log(`✅ Server running on port ${PORT}`);
+    } catch (err) {
+        console.error("❌ Database Connection Error:", err);
     }
-};
-
-module.exports = { pool, connectDB };
+});
