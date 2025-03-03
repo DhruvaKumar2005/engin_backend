@@ -12,23 +12,21 @@ const pool = new Pool({
 
 const connectDB = async () => {
   try {
-    await pool.connect();
+    const client = await pool.connect();
     console.log('✅ Database connected successfully');
+    client.release();
   } catch (err) {
     console.error('❌ Database Connection Error:', err);
     
-    // Provide more helpful error information
     if (!process.env.DATABASE_URL) {
       console.error('DATABASE_URL environment variable is not set!');
     } else {
       console.error('DATABASE_URL is set, but connection failed. Check if the URL is correct.');
     }
-    
-    // Don't exit in development for easier debugging
-    if (process.env.NODE_ENV === 'production') {
-      process.exit(1);
-    }
   }
 };
 
-module.exports = { pool, connectDB };
+// Export the pool directly (not in an object) to allow pool.query() to work
+module.exports = pool;
+// Also export connectDB separately to maintain compatibility with server.js
+module.exports.connectDB = connectDB;
