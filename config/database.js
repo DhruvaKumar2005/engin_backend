@@ -1,13 +1,13 @@
 // config/database.js
-const { Pool } = require('pg'); // Assuming you're using PostgreSQL
+const { Pool } = require('pg');
 require('dotenv').config();
 
+// Create a pool using the connection string
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Needed for connecting to some hosted PostgreSQL services
+  }
 });
 
 const connectDB = async () => {
@@ -16,7 +16,18 @@ const connectDB = async () => {
     console.log('✅ Database connected successfully');
   } catch (err) {
     console.error('❌ Database Connection Error:', err);
-    process.exit(1);
+    
+    // Provide more helpful error information
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL environment variable is not set!');
+    } else {
+      console.error('DATABASE_URL is set, but connection failed. Check if the URL is correct.');
+    }
+    
+    // Don't exit in development for easier debugging
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
   }
 };
 
