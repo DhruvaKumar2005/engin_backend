@@ -10,6 +10,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use(cors({
+    origin: "https://engin-git-main-mohammed-absals-projects.vercel.app/pages/getstarted.html", 
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true
+}));
+
 const userRoutes = require("./routes/userRoutes");
 app.use("/api", userRoutes);
 
