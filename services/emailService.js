@@ -1,6 +1,8 @@
 const { sendEmail } = require("../config/emailConfig");
 
 async function sendConfirmationEmail(email, fullName) {
+    console.log("sendConfirmationEmail called for:", email);
+    
     try {
         const subject = "Welcome to Engin - Your Journey Starts Here";
         
@@ -36,15 +38,25 @@ The Engin Team`;
             <p>The Engin Team</p>
         </div>`;
 
+        console.log("Preparing to send email via Resend API to:", email);
+        
+        // Check if RESEND_API_KEY is set
+        if (!process.env.RESEND_API_KEY) {
+            throw new Error("RESEND_API_KEY is not set in environment variables");
+        }
+        
         const result = await sendEmail(email, subject, text, html);
         
         if (result.success) {
             console.log(`Confirmation email sent to ${email} with ID: ${result.id}`);
+            return { success: true, id: result.id };
         } else {
             console.error("Error sending email:", result.error);
+            throw result.error;
         }
     } catch (error) {
-        console.error("Error sending email:", error);
+        console.error("Error in sendConfirmationEmail function:", error);
+        throw error; // Re-throw to be handled by caller
     }
 }
 
