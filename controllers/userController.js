@@ -1,5 +1,4 @@
 const pool = require("../config/database");
-const sendConfirmationEmail = require("../services/emailService");
 
 const registerUser = async (req, res, next) => {
     console.log("Registration attempt with data:", JSON.stringify(req.body));
@@ -28,18 +27,8 @@ const registerUser = async (req, res, next) => {
         );
         
         console.log("User inserted successfully:", result.rows[0].id);
-
-        // Try to send email but don't let it block registration
-        try {
-            console.log("Attempting to send confirmation email to:", email);
-            await sendConfirmationEmail(email, fullName);
-            console.log("Email sent successfully to:", email);
-        } catch (emailError) {
-            console.error("Failed to send confirmation email:", emailError);
-            // Continue despite email failure
-        }
-
         console.log("Registration complete for:", email);
+        
         return res.status(201).json({ 
             message: "User registered successfully!", 
             user: result.rows[0] 

@@ -26,7 +26,6 @@ const connectDB = async () => {
   }
 };
 
-// Export the pool directly (not in an object) to allow pool.query() to work
+// Export the pool correctly to work with the existing code
 module.exports = pool;
-// Also export connectDB separately to maintain compatibility with server.js
 module.exports.connectDB = connectDB;

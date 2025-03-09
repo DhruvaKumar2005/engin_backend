@@ -36,7 +36,7 @@ app.use((err, req, res, next) => {
       message: err.message,
       stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
     });
-  });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
